@@ -4,6 +4,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ObservableField
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
+import kotlinx.coroutines.experimental.android.Main
+import kotlinx.coroutines.experimental.launch
 import pl.szkoleniaandroid.billexpert.api.Bill
 import pl.szkoleniaandroid.billexpert.api.BillApi
 import pl.szkoleniaandroid.billexpert.api.Category
@@ -63,17 +68,14 @@ class BillDetailsViewModel(private val billApi: BillApi, private val sessionRepo
                 comment = comment.get()!!,
                 objectId = ""
         )
-        val call = billApi.postBill(bill, sessionRepository.getToken())
-        call.enqueue(object : Callback<PostBillResponse> {
-            override fun onFailure(call: Call<PostBillResponse>, t: Throwable) {
+        val call: Deferred<Response<PostBillResponse>> = billApi.postBill(bill)
+        GlobalScope.launch(Dispatchers.Main) {
+            val response = call.await()
+            if (response.isSuccessful) {
+                view?.saved()
             }
+        }
 
-            override fun onResponse(call: Call<PostBillResponse>, response: Response<PostBillResponse>) {
-                if (response.isSuccessful) {
-                    view?.saved()
-                }
-            }
 
-        })
     }
 }
