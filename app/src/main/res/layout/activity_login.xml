@@ -30,7 +30,7 @@
                 android:id="@+id/username_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Username"
+                android:hint="@string/username_hint"
 
                 android:text="@={viewmodel.username}" />
 
@@ -48,7 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
-                android:hint="Password"
+                android:hint="@string/password_hint"
                 android:inputType="textPassword"
                 android:text="@={viewmodel.password}" />
 
@@ -62,7 +62,7 @@
             android:layout_marginTop="20dp"
             android:onClick="@{()->viewmodel.loginClicked()}"
             android:padding="20dp"
-            android:text="Login" />
+            android:text="@string/login" />
 
     </LinearLayout>
 </layout>

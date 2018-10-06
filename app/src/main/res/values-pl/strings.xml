@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="username_hint">Nazwa użytkownika</string>
+    <string name="password_hint">Hasło</string>
+    <string name="login">Zaloguj</string>
+    <string name="cant_be_empty">Wymagane pole</string>
+</resources>
