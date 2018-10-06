@@ -1,10 +1,12 @@
 package pl.szkoleniaandroid.billexpert
 
+import android.R
 import androidx.fragment.app.Fragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.databinding.ObservableArrayList
 import kotlinx.coroutines.experimental.Dispatchers
 import kotlinx.coroutines.experimental.GlobalScope
@@ -19,7 +21,7 @@ import timber.log.Timber
 /**
  * A placeholder fragment containing a simple view.
  */
-class BillsActivityFragment : Fragment() {
+class BillsActivityFragment : Fragment(), BillsView {
 
     lateinit var binding: FragmentBillsBinding
     lateinit var viewModel: BillsViewModel
@@ -36,12 +38,34 @@ class BillsActivityFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel.loadBills()
     }
+
+    override fun showBills(bills: List<Bill>) {
+
+       // adapter.addAll(bills)
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.view = this
+
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.view = null
+    }
+
+}
+
+interface BillsView {
+    fun showBills(bills: List<Bill>)
 }
 
 class BillsViewModel(private val billApi: BillApi, private val sessionRepository: SessionRepository) {
 
     val bills = ObservableArrayList<Bill>()
-
+    var view: BillsView? = null
 
     init {
         bills.add(Bill(name = "test", userId = ""))
@@ -53,6 +77,8 @@ class BillsViewModel(private val billApi: BillApi, private val sessionRepository
             if (resposne.isSuccessful) {
                 bills.addAll(resposne.body()!!.results)
                 bills.forEach { Timber.d(it.toString()) }
+
+                view?.showBills(bills)
             }
         }
 
