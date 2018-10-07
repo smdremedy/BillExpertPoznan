@@ -7,13 +7,13 @@
 
         <variable
             name="item"
-            type="pl.szkoleniaandroid.billexpert.api.Bill" />
+            type="pl.szkoleniaandroid.billexpert.BillItem" />
     </data>
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-
-        android:layout_height="100dp">
+        android:layout_height="100dp"
+        android:layout_margin="8dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -23,15 +23,17 @@
 
             <ImageView
                 android:id="@+id/category_image_view"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="68dp"
+                android:layout_height="68dp"
+                android:scaleType="centerInside"
+                app:imageUrl="@{item.categoryUrl}"
                 tools:src="@tools:sample/avatars" />
 
             <TextView
                 android:id="@+id/name_text_view"
-                android:text="@{item.name}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@{item.name}"
                 app:layout_constraintStart_toEndOf="@id/category_image_view"
                 tools:text="@tools:sample/cities" />
 
@@ -48,6 +50,7 @@
                 android:id="@+id/amount_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@{item.amount}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:text="100.5" />

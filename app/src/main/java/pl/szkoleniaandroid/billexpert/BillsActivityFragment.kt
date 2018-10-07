@@ -62,24 +62,30 @@ interface BillsView {
 
 class BillsViewModel(private val billApi: BillApi, private val sessionRepository: SessionRepository) {
 
-    val bills = ObservableArrayList<Bill>()
-    val itemBinding: ItemBinding<Bill> = ItemBinding.of(BR.item, R.layout.bill_item)
+    val bills = ObservableArrayList<BillItem>()
+    val itemBinding: ItemBinding<BillItem> = ItemBinding.of(BR.item, R.layout.bill_item)
     var view: BillsView? = null
-
-    init {
-        bills.add(Bill(name = "test", userId = ""))
-    }
 
     fun loadBills() {
         GlobalScope.launch(Dispatchers.Main) {
             val resposne = billApi.getBills().await()
             if (resposne.isSuccessful) {
-                bills.addAll(resposne.body()!!.results)
-                bills.forEach { Timber.d(it.toString()) }
+                bills.addAll(
+                        resposne.body()!!.results.map {
+                            BillItem(
+                                    name = it.name,
+                                    comment = it.comment,
+                                    amount = it.amount,
+                                    categoryUrl = "file:///android_asset/${it.category.name.toLowerCase()}.png"
+                            )
+                        }
+                )
 
-                view?.showBills(bills)
+                bills.forEach { Timber.d(it.toString()) }
             }
         }
 
     }
 }
+
+data class BillItem(val name: String, val comment: String, val amount: Double, val categoryUrl: String)
