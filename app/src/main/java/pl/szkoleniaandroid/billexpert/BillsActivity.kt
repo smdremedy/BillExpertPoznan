@@ -1,9 +1,11 @@
 package pl.szkoleniaandroid.billexpert
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -39,7 +41,7 @@ class BillsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_add -> {
-                startActivity(Intent(this, BillDetailsActivity::class.java))
+                startActivityForResult(Intent(this, BillDetailsActivity::class.java), REQUEST_ADD)
                 return true
             }
             R.id.action_refresh -> return true
@@ -51,6 +53,26 @@ class BillsActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_ADD) {
+
+            if(resultCode == Activity.RESULT_OK) {
+
+                val fragment: BillsActivityFragment = supportFragmentManager.findFragmentById(R.id.fragment) as BillsActivityFragment
+                fragment.viewModel.loadBills()
+            } else {
+                Toast.makeText(this, "Nothing added!", Toast.LENGTH_SHORT).show()
+            }
+
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    companion object {
+        const val REQUEST_ADD = 1
     }
 
 }

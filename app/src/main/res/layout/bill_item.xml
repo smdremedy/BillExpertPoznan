@@ -8,12 +8,17 @@
         <variable
             name="item"
             type="pl.szkoleniaandroid.billexpert.BillItem" />
+
+        <variable
+            name="listener"
+            type="pl.szkoleniaandroid.billexpert.OnBillClickedListener" />
     </data>
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_margin="8dp">
+        android:layout_margin="8dp"
+        android:onClick="@{()->listener.onBillClicked(item)}">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

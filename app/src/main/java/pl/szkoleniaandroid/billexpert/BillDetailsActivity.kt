@@ -1,9 +1,12 @@
 package pl.szkoleniaandroid.billexpert
 
+import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ObservableField
+import androidx.databinding.ObservableInt
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.Dispatchers
 import kotlinx.coroutines.experimental.GlobalScope
@@ -21,7 +24,10 @@ import retrofit2.Response
 import java.util.*
 
 class BillDetailsActivity : AppCompatActivity(), BillDetailsView {
-    override fun saved() {
+    override fun saved(bill: Bill) {
+        val intent = Intent()
+        intent.putExtra("bill", bill)
+        setResult(Activity.RESULT_OK, intent)
         finish()
     }
 
@@ -31,7 +37,10 @@ class BillDetailsActivity : AppCompatActivity(), BillDetailsView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_bill_details)
-        viewModel = BillDetailsViewModel(billApi, sessionRepository)
+        val bill = intent.getSerializableExtra("bill") as Bill? ?: Bill(
+                userId = sessionRepository.getUserId()
+        )
+        viewModel = BillDetailsViewModel(billApi, sessionRepository, bill)
         binding.viewmodel = viewModel
     }
 
@@ -47,14 +56,19 @@ class BillDetailsActivity : AppCompatActivity(), BillDetailsView {
 }
 
 interface BillDetailsView {
-    fun saved()
+    fun saved(bill: Bill)
 }
 
-class BillDetailsViewModel(private val billApi: BillApi, private val sessionRepository: SessionRepository) {
-    val date = Date()
-    val name = ObservableString("")
-    val amount = ObservableString("0.0")
-    val comment = ObservableString("")
+class BillDetailsViewModel(private val billApi: BillApi,
+                           private val sessionRepository: SessionRepository,
+                           private val originalBill: Bill) {
+    val date = originalBill.date
+    val name = ObservableString(originalBill.name)
+    val amount = ObservableString(originalBill.amount.toString())
+    val comment = ObservableString(originalBill.comment)
+
+    val categories = Category.values().toList()
+    val selectedCategoryIndex = ObservableInt(originalBill.category.ordinal)
 
     var view: BillDetailsView? = null
 
@@ -64,7 +78,7 @@ class BillDetailsViewModel(private val billApi: BillApi, private val sessionRepo
                 date = date,
                 name = name.get()!!,
                 amount = amount.get()!!.toDouble(),
-                category = Category.OTHER,
+                category = Category.values()[selectedCategoryIndex.get()],
                 comment = comment.get()!!,
                 objectId = ""
         )
@@ -72,7 +86,7 @@ class BillDetailsViewModel(private val billApi: BillApi, private val sessionRepo
         GlobalScope.launch(Dispatchers.Main) {
             val response = call.await()
             if (response.isSuccessful) {
-                view?.saved()
+                view?.saved(bill)
             }
         }
 

@@ -4,6 +4,7 @@ import kotlinx.coroutines.experimental.Deferred
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
+import java.io.Serializable
 import java.util.*
 
 
@@ -59,7 +60,7 @@ data class Bill(
         val category: Category = Category.OTHER,
         val comment: String = "",
         val objectId: String = ""
-)
+): Serializable
 
 class BillsResponse(
         val results: List<Bill>

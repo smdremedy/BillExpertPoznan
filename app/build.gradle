@@ -51,4 +51,10 @@ dependencies {
     implementation 'me.tatarka.bindingcollectionadapter2:bindingcollectionadapter:3.0.0-beta3'
     implementation 'me.tatarka.bindingcollectionadapter2:bindingcollectionadapter-recyclerview:3.0.0-beta3'
     implementation 'com.squareup.picasso:picasso:2.71828'
+
+    def room_version = "2.0.0-rc01"
+
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version" // use kapt for Kotlin
+
 }
