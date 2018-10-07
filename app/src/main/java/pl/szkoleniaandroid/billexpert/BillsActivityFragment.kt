@@ -1,6 +1,5 @@
 package pl.szkoleniaandroid.billexpert
 
-import android.R
 import androidx.fragment.app.Fragment
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +11,7 @@ import kotlinx.coroutines.experimental.Dispatchers
 import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.android.Main
 import kotlinx.coroutines.experimental.launch
+import me.tatarka.bindingcollectionadapter2.ItemBinding
 import pl.szkoleniaandroid.billexpert.api.Bill
 import pl.szkoleniaandroid.billexpert.api.BillApi
 import pl.szkoleniaandroid.billexpert.databinding.FragmentBillsBinding
@@ -40,9 +40,7 @@ class BillsActivityFragment : Fragment(), BillsView {
     }
 
     override fun showBills(bills: List<Bill>) {
-
-       // adapter.addAll(bills)
-
+        // adapter.addAll(bills)
     }
 
     override fun onStart() {
@@ -65,6 +63,7 @@ interface BillsView {
 class BillsViewModel(private val billApi: BillApi, private val sessionRepository: SessionRepository) {
 
     val bills = ObservableArrayList<Bill>()
+    val itemBinding: ItemBinding<Bill> = ItemBinding.of(BR.item, R.layout.bill_item)
     var view: BillsView? = null
 
     init {
