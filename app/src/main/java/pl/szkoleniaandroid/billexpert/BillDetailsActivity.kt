@@ -17,6 +17,7 @@ import pl.szkoleniaandroid.billexpert.api.BillApi
 import pl.szkoleniaandroid.billexpert.api.Category
 import pl.szkoleniaandroid.billexpert.api.PostBillResponse
 import pl.szkoleniaandroid.billexpert.databinding.ActivityBillDetailsBinding
+import pl.szkoleniaandroid.billexpert.db.BillRepository
 import pl.szkoleniaandroid.billexpert.repository.SessionRepository
 import retrofit2.Call
 import retrofit2.Callback
@@ -40,7 +41,7 @@ class BillDetailsActivity : AppCompatActivity(), BillDetailsView {
         val bill = intent.getSerializableExtra("bill") as Bill? ?: Bill(
                 userId = sessionRepository.getUserId()
         )
-        viewModel = BillDetailsViewModel(billApi, sessionRepository, bill)
+        viewModel = BillDetailsViewModel(billApi, sessionRepository, billRepository, bill)
         binding.viewmodel = viewModel
     }
 
@@ -61,6 +62,7 @@ interface BillDetailsView {
 
 class BillDetailsViewModel(private val billApi: BillApi,
                            private val sessionRepository: SessionRepository,
+                           private val billRepository: BillRepository,
                            private val originalBill: Bill) {
     val date = originalBill.date
     val name = ObservableString(originalBill.name)
@@ -86,7 +88,12 @@ class BillDetailsViewModel(private val billApi: BillApi,
         GlobalScope.launch(Dispatchers.Main) {
             val response = call.await()
             if (response.isSuccessful) {
-                view?.saved(bill)
+                GlobalScope.launch {
+
+                    billRepository.saveBill(bill.copy(objectId = response.body()!!.objectId))
+                    view?.saved(bill)
+                }
+
             }
         }
 

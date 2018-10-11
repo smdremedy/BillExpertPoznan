@@ -19,7 +19,7 @@ fun bindDate(textView: TextView, date: Date) {
 }
 
 @BindingAdapter("imageUrl")
-fun bindUrl(imageView: ImageView, url: String) {
+fun bindUrl(imageView: ImageView, url: String?) {
     Picasso.get().load(url)
             .into(imageView)
 }

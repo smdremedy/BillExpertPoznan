@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.databinding.ObservableArrayList
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import kotlinx.coroutines.experimental.Dispatchers
 import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.android.Main
@@ -18,6 +20,7 @@ import pl.szkoleniaandroid.billexpert.api.Bill
 import pl.szkoleniaandroid.billexpert.api.BillApi
 import pl.szkoleniaandroid.billexpert.api.Category
 import pl.szkoleniaandroid.billexpert.databinding.FragmentBillsBinding
+import pl.szkoleniaandroid.billexpert.db.BillRepository
 import pl.szkoleniaandroid.billexpert.repository.SessionRepository
 import timber.log.Timber
 
@@ -34,8 +37,9 @@ class BillsActivityFragment : Fragment(), BillsView {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         binding = FragmentBillsBinding.inflate(inflater, container, false)
-        viewModel = BillsViewModel(activity!!.billApi, activity!!.sessionRepository)
+        viewModel = BillsViewModel(activity!!.billApi, activity!!.sessionRepository, activity!!.billRepository)
         binding.viewmodel = viewModel
+        binding.setLifecycleOwner(this)
         return binding.root
     }
 
@@ -70,7 +74,9 @@ interface OnBillClickedListener {
     fun onBillClicked(bill: BillItem)
 }
 
-class BillsViewModel(private val billApi: BillApi, private val sessionRepository: SessionRepository) {
+class BillsViewModel(private val billApi: BillApi,
+                     private val sessionRepository: SessionRepository,
+                     private val billRepository: BillRepository) {
 
     //    val bills = ObservableArrayList<BillItem>()
 //    val itemBinding: ItemBinding<BillItem> = ItemBinding.of<BillItem>(BR.item, R.layout.bill_item).apply {
@@ -82,6 +88,7 @@ class BillsViewModel(private val billApi: BillApi, private val sessionRepository
 //        })
 //    }
     val bills = ObservableArrayList<Item>()
+    lateinit var billsLiveData: LiveData<List<Item>>
     val itemBinding: OnItemBind<Item> = OnItemBind { itemBinding, position, item ->
         when (item) {
             is CategoryItem -> itemBinding.set(BR.item, R.layout.category_item)
@@ -99,6 +106,15 @@ class BillsViewModel(private val billApi: BillApi, private val sessionRepository
     var view: BillsView? = null
 
     fun loadBills() {
+        billsLiveData = Transformations.map(billRepository.getBills()){
+            it.map { BillItem(
+                    name = it.name,
+                    comment = it.comment,
+                    amount = it.amount,
+                    categoryUrl = "file:///android_asset/${it.category.name.toLowerCase()}.png",
+                    bill = it
+            ) }
+        }
         GlobalScope.launch(Dispatchers.Main) {
             val resposne = billApi.getBills().await()
             if (resposne.isSuccessful) {

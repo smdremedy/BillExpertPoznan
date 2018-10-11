@@ -18,7 +18,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/bills_list"
-            app:items="@{viewmodel.bills}"
+            app:items="@{viewmodel.billsLiveData}"
             android:scrollbars="vertical"
             itemBinding="@{viewmodel.itemBinding}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

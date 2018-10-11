@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: "com.jaredsburrows.spoon"
 
 
 android {
@@ -39,7 +40,10 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
+    androidTestImplementation 'androidx.test:rules:1.1.0-alpha4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.1.0-alpha4'
+    androidTestImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.0.0-RC1'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
@@ -51,10 +55,14 @@ dependencies {
     implementation 'me.tatarka.bindingcollectionadapter2:bindingcollectionadapter:3.0.0-beta3'
     implementation 'me.tatarka.bindingcollectionadapter2:bindingcollectionadapter-recyclerview:3.0.0-beta3'
     implementation 'com.squareup.picasso:picasso:2.71828'
-
     def room_version = "2.0.0-rc01"
-
     implementation "androidx.room:room-runtime:$room_version"
-    kapt "androidx.room:room-compiler:$room_version" // use kapt for Kotlin
+    kapt "androidx.room:room-compiler:$room_version"
+    // use kapt for Kotlin
+    implementation 'com.facebook.stetho:stetho:1.5.0'
+    androidTestImplementation 'org.mockito:mockito-android:2.23.0'
+    androidTestCompile 'com.jraska:falcon:2.1.1'
+    androidTestCompile 'com.jraska:falcon-spoon-compat:2.1.1'
 
+        androidTestCompile "com.squareup.spoon:spoon-client:2.0.0-SNAPSHOT" // For Spoon snapshot, until 2.0.0 is released
 }

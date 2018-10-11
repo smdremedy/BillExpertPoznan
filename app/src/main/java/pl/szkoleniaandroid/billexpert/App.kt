@@ -3,11 +3,17 @@ package pl.szkoleniaandroid.billexpert
 import android.app.Activity
 import android.app.Application
 import android.preference.PreferenceManager
+import androidx.room.Room
+import com.facebook.stetho.Stetho
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.experimental.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import okhttp3.OkHttpClient
+import pl.szkoleniaandroid.billexpert.api.Bill
 import pl.szkoleniaandroid.billexpert.api.BillApi
+import pl.szkoleniaandroid.billexpert.db.BillDatabase
+import pl.szkoleniaandroid.billexpert.db.BillRepository
+import pl.szkoleniaandroid.billexpert.db.BillRoomRepository
 import pl.szkoleniaandroid.billexpert.repository.SessionRepository
 import pl.szkoleniaandroid.billexpert.repository.SharedPreferencesSessionRepository
 import retrofit2.Retrofit
@@ -21,11 +27,13 @@ class App : Application() {
 
     lateinit var billApi: BillApi
     lateinit var sessionRepository: SessionRepository
+    lateinit var billRepository: BillRepository
 
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
+            Stetho.initializeWithDefaults(this)
         }
 
         val moshi = Moshi.Builder()
@@ -55,8 +63,15 @@ class App : Application() {
         sessionRepository = SharedPreferencesSessionRepository(
                 PreferenceManager.getDefaultSharedPreferences(this)
         )
+
+        val database = Room.databaseBuilder(this, BillDatabase::class.java, "bill_db").build()
+
+        billRepository = BillRoomRepository(database.getBillDao())
     }
 }
 
 val Activity.sessionRepository: SessionRepository
     get() = (this.application as App).sessionRepository
+
+val Activity.billRepository: BillRepository
+    get() = (this.application as App).billRepository
